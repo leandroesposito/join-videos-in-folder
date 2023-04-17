@@ -15,9 +15,9 @@ def listFiles(dirpath:str) -> list:
         else:
             # sort files by names
             sorted_files = sorted(files)
-        
+
         filespath = [os.path.join(dir,file) for file in sorted_files]
-    
+
     return filespath
 
 def main(argv):
@@ -25,9 +25,11 @@ def main(argv):
     processed:list = []
     while len(dirpaths) > 0:
         dirpath = dirpaths.pop()
-        try:        
-            files = listFiles(dirpath)
+        try:
             txt_file_path = os.path.join(dirpath, "fileslist.txt")
+            if os.path.isfile(txt_file_path):
+                os.remove(txt_file_path)
+            files = listFiles(dirpath)
             # generate text file formatted for ffmpeg listing all videos to join
             with open(txt_file_path, "w", encoding="utf-8") as f:
                 f.writelines([f"file '{f}'\n" for f  in files])
@@ -47,7 +49,7 @@ def main(argv):
         processed.append(dirpath)
         os.remove(txt_file_path)
 
-    # show orignal files size, original folder name and generated file name with final file size 
+    # show orignal files size, original folder name and generated file name with final file size
     # and percentage of file size in relstion with original files
     for dirpath in processed:
         folder_size = sum((os.path.getsize(os.path.join(dirpath, f)) for f in os.listdir(dirpath)))
@@ -63,9 +65,9 @@ def main(argv):
         print(f"File size: {convert_bytes(file_size)}")
         print(f"{int(file_size / folder_size * 100)}% of original files size")
         print()
-    
+
     input("100% Press RETURN to exit...")
-    
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Join video files inside a folder using ffmpeg without reencoding so make sure they are compatible")
 
