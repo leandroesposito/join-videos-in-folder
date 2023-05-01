@@ -22,6 +22,7 @@ def listFiles(dirpath:str) -> list:
 
 def main(argv):
     dirpaths:list = argv.path
+    drive:str = argv.drive + ":" if argv.drive is not None else None
     processed:list = []
     while len(dirpaths) > 0:
         dirpath = dirpaths.pop()
@@ -35,6 +36,9 @@ def main(argv):
                 f.writelines([f"file '{f}'\n" for f  in files])
 
             target_folder, target_filename = os.path.split(dirpath)
+            if drive is not None:
+                target_folder = os.path.join(drive, os.path.splitdrive(target_folder)[1])
+
             # generate ffmpeg command string
             command = f'ffmpeg -f concat -safe 0 -i "{txt_file_path}" -c copy "{os.path.join(target_folder, target_filename)}.mp4"'
             print(command)
@@ -55,6 +59,9 @@ def main(argv):
         folder_size = sum((os.path.getsize(os.path.join(dirpath, f)) for f in os.listdir(dirpath)))
 
         target_folder, target_filename = os.path.split(dirpath)
+        if drive is not None:
+                target_folder = os.path.join(drive, os.path.splitdrive(target_folder)[1])
+
         file_name = os.path.join(target_folder, target_filename + ".mp4")
 
         file_size = os.path.getsize(file_name)
@@ -72,6 +79,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Join video files inside a folder using ffmpeg without reencoding so make sure they are compatible")
 
     parser.add_argument("path", nargs="+", help="Directory with videos to join")
+    parser.add_argument("--drive", "-d", help="Drive to output videos")
 
     argv = parser.parse_args()
+    print(argv)
+
     main(argv)
