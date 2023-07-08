@@ -25,7 +25,7 @@ def main(argv):
     drive:str = argv.drive + ":" if argv.drive is not None else None
     processed:list = []
     while len(dirpaths) > 0:
-        dirpath = dirpaths.pop()
+        dirpath = dirpaths.pop(0)
         try:
             txt_file_path = os.path.join(dirpath, "fileslist.txt")
             if os.path.isfile(txt_file_path):
