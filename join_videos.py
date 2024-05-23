@@ -23,6 +23,7 @@ def listFiles(dirpath:str) -> list:
 def main(argv):
     dirpaths:list = argv.path
     drive:str = argv.drive + ":" if argv.drive is not None else None
+    audio_only = argv.audio_only
     processed:list = []
     while len(dirpaths) > 0:
         dirpath = dirpaths.pop(0)
@@ -40,7 +41,11 @@ def main(argv):
                 target_folder = os.path.join(drive, os.path.splitdrive(target_folder)[1])
 
             # generate ffmpeg command string
-            command = f'ffmpeg -f concat -safe 0 -i "{txt_file_path}" -c copy "{os.path.join(target_folder, target_filename)}.mp4"'
+
+            if audio_only:
+                command = f'ffmpeg -f concat -safe 0 -i "{txt_file_path}" -vn -acodec copy "{os.path.join(target_folder, target_filename)}.aac"'
+            else:
+                command = f'ffmpeg -f concat -safe 0 -i "{txt_file_path}" -c copy "{os.path.join(target_folder, target_filename)}.mp4"'
             print(command)
 
             # run command
@@ -62,7 +67,10 @@ def main(argv):
         if drive is not None:
                 target_folder = os.path.join(drive, os.path.splitdrive(target_folder)[1])
 
-        file_name = os.path.join(target_folder, target_filename + ".mp4")
+        if audio_only:
+            file_name = os.path.join(target_folder, target_filename + ".aac")
+        else:
+            file_name = os.path.join(target_folder, target_filename + ".mp4")
 
         file_size = os.path.getsize(file_name)
 
@@ -80,6 +88,7 @@ if __name__ == "__main__":
 
     parser.add_argument("path", nargs="+", help="Directory with videos to join")
     parser.add_argument("--drive", "-d", help="Drive to output videos")
+    parser.add_argument("--audio-only", "-a", action="store_true", help="Create only audio file")
 
     argv = parser.parse_args()
     print(argv)
