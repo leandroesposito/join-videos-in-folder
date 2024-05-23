@@ -78,7 +78,10 @@ def main(argv):
         print(f"File: {file_name}")
         print(f"Folder size: {convert_bytes(folder_size)}")
         print(f"File size: {convert_bytes(file_size)}")
+
         print(f"{int(file_size / folder_size * 100)}% of original files size")
+        if int(file_size / folder_size * 100) < 90:
+            print ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         print()
 
     input("100% Press RETURN to exit...")
