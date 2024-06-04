@@ -84,7 +84,6 @@ def main(argv):
             print ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         print()
 
-    input("100% Press RETURN to exit...")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Join video files inside a folder using ffmpeg without reencoding so make sure they are compatible")
