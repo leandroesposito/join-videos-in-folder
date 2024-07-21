@@ -6,6 +6,7 @@ def listFiles(dirpath:str) -> list:
     """
     List all files inside folder and sort
     """
+    filespath = []
     for dir, _, filenames in os.walk(dirpath):
         files = filenames.copy()
         # extract filename without extention and check if is a number
@@ -16,7 +17,7 @@ def listFiles(dirpath:str) -> list:
             # sort files by names
             sorted_files = sorted(files)
 
-        filespath = [os.path.join(dir,file) for file in sorted_files]
+        filespath += [os.path.join(dir,file) for file in sorted_files]
 
     return filespath
 
