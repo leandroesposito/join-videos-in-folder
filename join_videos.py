@@ -25,10 +25,16 @@ def main(argv):
     dirpaths:list = argv.path
     drive:str = argv.drive + ":" if argv.drive is not None else None
     audio_only = argv.audio_only
+    overwrite = argv.overwrite
+
     processed:list = []
     while len(dirpaths) > 0:
         dirpath = dirpaths.pop(0)
         try:
+            target_folder, target_filename = os.path.split(dirpath)
+            if drive is not None:
+                target_folder = os.path.join(drive, os.path.splitdrive(target_folder)[1])
+
             txt_file_path = os.path.join(dirpath, "fileslist.txt")
             if os.path.isfile(txt_file_path):
                 os.remove(txt_file_path)
@@ -37,16 +43,25 @@ def main(argv):
             with open(txt_file_path, "w", encoding="utf-8") as f:
                 f.writelines([f"file '{f}'\n" for f  in files])
 
-            target_folder, target_filename = os.path.split(dirpath)
-            if drive is not None:
-                target_folder = os.path.join(drive, os.path.splitdrive(target_folder)[1])
-
             # generate ffmpeg command string
+            command = "ffmpeg"
+
+            if overwrite:
+                command += " -y"
+            else:
+                command += " -n"
+
+            command += f' -f concat -safe 0 -i "{txt_file_path}"'
 
             if audio_only:
-                command = f'ffmpeg -f concat -safe 0 -i "{txt_file_path}" -vn -acodec copy "{os.path.join(target_folder, target_filename)}.aac"'
+                command += " -vn -acodec copy"
+                output_path = os.path.join(target_folder, target_filename) + ".aac"
             else:
-                command = f'ffmpeg -f concat -safe 0 -i "{txt_file_path}" -c copy "{os.path.join(target_folder, target_filename)}.mp4"'
+                command += " -c copy"
+                output_path = os.path.join(target_folder, target_filename) + ".mp4"
+
+            command += f' "{output_path}"'
+
             print(command)
 
             # run command
@@ -92,6 +107,7 @@ if __name__ == "__main__":
     parser.add_argument("path", nargs="+", help="Directory with videos to join")
     parser.add_argument("--drive", "-d", help="Drive to output videos")
     parser.add_argument("--audio-only", "-a", action="store_true", help="Create only audio file")
+    parser.add_argument("--overwrite", "-ov", action="store_true", help="Overwrite file if exist, skip by default")
 
     argv = parser.parse_args()
     print(argv)
